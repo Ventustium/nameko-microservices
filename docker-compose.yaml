@@ -50,3 +50,10 @@ services:
       - mysql
     environment:
       - PMA_ARBITRARY=1
+  
+  redis:
+    container_name: catea-redis
+    image: redis:7.0.2-alpine3.16
+    restart: always
+    ports:
+      - 6379:6379

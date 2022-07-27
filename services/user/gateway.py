@@ -1,3 +1,4 @@
+from http import cookies
 import json
 import bcrypt
 
@@ -5,12 +6,13 @@ from nameko.rpc import RpcProxy
 from nameko.web.handlers import http
 from requests import session
 from yaml import load
+from dependencies.redis import SessionProvider
 
 from werkzeug import Response
 
 class UserGatewayService:
       name = 'user_gateway'
-      #session_provider = SessionProvider()
+      session_provider = SessionProvider()
 
       user_rpc = RpcProxy('user_service')
 
@@ -82,12 +84,25 @@ class UserGatewayService:
       def login_user_account(self, request):
             email_address = request.get_json()["email_address"]
             password = request.get_json()["password"]
+            session_id=request.cookies.get('SESSID')
+            if session_id:
+                  session = self.session_provider.get_session_data(session_id)
+                  if session:
+                        json_response={"status":"error","message":"You are already logged in"}
+                        response=Response(json.dumps(json_response), mimetype='application/json')
+                        response.status_code=400
+                        return response
 
             if(self.user_rpc.login_user_account(email_address, password)):
                   response = Response(json.dumps({
                         "status":"success",
                         "message":"Logged in successfully"
-                  }), mimetype='application/json')
+                  }), mimetype = 'application/json')
+                  session_id = self.session_provider.generate_session_id()
+                  user_data=self.user_rpc.checking_user_account_availability(email_address)
+                  self.session_provider.set_session_data(session_id,json.dumps(user_data["data"]))
+                  print(user_data)
+                  response.set_cookie('SESSID', session_id)
                   response.status_code=200
                   return response
 
@@ -96,4 +111,17 @@ class UserGatewayService:
                         "message":"Unauthorized: invalid credentials (wrong email/password)"
             }), mimetype='application/json')
             response.status_code=401
+            return response
+
+      @http('POST', '/api/user/logout/')
+      def logout_user_account(self, request):
+            session_id = request.cookies.get('SESSID')
+            if session_id:
+                  self.session_provider.destroy_session_data(session_id)
+                  response=Response(json.dumps({"status":"success","message":"Logged out successfully"}),mimetype="application/json")
+                  response.delete_cookie('SESSID')
+                  response.status_code=200
+                  return response
+            response=Response(json.dumps({"status":"error","message":"You are not logged in"}),mimetype="application/json")
+            response.status_code=400
             return response
