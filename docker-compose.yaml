@@ -1,0 +1,52 @@
+version: '3.9'
+
+volumes:
+  mysql-data:
+
+services:
+  # Reverse Proxy
+  nginx:
+    container_name: nameko-nginx
+    image: nginx:1.23.0-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  
+  # AMQP
+  rabbitmq:
+    container_name: nameko-rabbitmq
+    image: rabbitmq:3.10-management-alpine
+    restart: always
+    ports:
+      - 5672:5672
+  
+  # Data Storage
+  mysql:
+    container_name: nameko-mysql
+    image: mysql:5.7.38-debian
+    command: 
+      --init-file /data/application/init.sql 
+      --default-authentication-plugin=mysql_native_password
+    volumes:
+      - .mysql-data:/var/lib/mysql
+      - ./sql/init.sql:/data/application/init.sql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: change_me
+    ports:
+      - 3306:3306
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+  
+  # Database Admin
+  phpmyadmin:
+    container_name: nameko-phpmyadmin
+    image: phpmyadmin:latest
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      - PMA_ARBITRARY=1
