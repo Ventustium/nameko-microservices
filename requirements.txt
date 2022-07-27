@@ -1,0 +1,6 @@
+nameko == 2.14.1
+nameko-reloader == 0.1.4
+PyJWT == 1.7.1
+bcrypt == 3.2.2
+mysql-connector-python == 8.0.30
+redis == 4.3.4
