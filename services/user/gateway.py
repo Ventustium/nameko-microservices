@@ -1,11 +1,8 @@
-from http import cookies
 import json
 import bcrypt
 
 from nameko.rpc import RpcProxy
 from nameko.web.handlers import http
-from requests import session
-from yaml import load
 from dependencies.redis import SessionProvider
 
 from werkzeug import Response
@@ -51,6 +48,7 @@ class UserGatewayService:
             response.status_code=200
             return response
       
+
       @http('POST', '/api/user/')
       def user_account_registration(self, request):
             email_address = request.get_json()["email_address"]
@@ -79,6 +77,7 @@ class UserGatewayService:
             }), mimetype='application/json')
             response.status_code=201
             return response
+
 
       @http('POST','/api/user/login/')
       def login_user_account(self, request):
@@ -113,6 +112,7 @@ class UserGatewayService:
             response.status_code=401
             return response
 
+
       @http('POST', '/api/user/logout/')
       def logout_user_account(self, request):
             session_id = request.cookies.get('SESSID')
@@ -125,3 +125,4 @@ class UserGatewayService:
             response=Response(json.dumps({"status":"error","message":"You are not logged in"}),mimetype="application/json")
             response.status_code=400
             return response
+
