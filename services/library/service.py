@@ -1,4 +1,3 @@
-from httplib2 import Response
 from nameko.rpc import rpc
 from dependencies.database import DatabaseProvider
 
