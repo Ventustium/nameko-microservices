@@ -13,7 +13,7 @@ class UserGatewayService:
 
       user_rpc = RpcProxy('user_service')
 
-      @http('GET', '/api/user/email/')
+      @http('GET', '/api/user/email')
       def checking_user_account_avaibility(self, request):
             # PLEASE CODE WITH SPECIFICATION BELOW
 
@@ -49,7 +49,7 @@ class UserGatewayService:
             return response
       
 
-      @http('POST', '/api/user/')
+      @http('POST', '/api/user')
       def user_account_registration(self, request):
             email_address = request.get_json()["email_address"]
             check_email = self.user_rpc.checking_user_account_availability(email_address)
@@ -79,7 +79,7 @@ class UserGatewayService:
             return response
 
 
-      @http('POST','/api/user/login/')
+      @http('POST','/api/user/login')
       def login_user_account(self, request):
             email_address = request.get_json()["email_address"]
             password = request.get_json()["password"]
@@ -113,7 +113,7 @@ class UserGatewayService:
             return response
 
 
-      @http('POST', '/api/user/logout/')
+      @http('POST', '/api/user/logout')
       def logout_user_account(self, request):
             session_id = request.cookies.get('SESSID')
             if session_id:

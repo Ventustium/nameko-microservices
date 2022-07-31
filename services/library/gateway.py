@@ -14,7 +14,7 @@ class LibraryGateway:
       
       library_rpc = RpcProxy('library_service')
 
-      @http('GET', '/api/library/')
+      @http('GET', '/api/library/lightnovel')
       def lightnovel_list(self, request):
             print("API CALLED")
             json_response = self.library_rpc.lightnovel_list()
@@ -27,7 +27,7 @@ class LibraryGateway:
                   response.status_code=200
                   return response
       
-      @http('GET', '/api/library/search/title/<string:title>/')
+      @http('GET', '/api/library/lightnovel/search/title/<string:title>')
       def lightnovel_search_title(self, request, title):
             json_response = self.library_rpc.checking_lightnovel_availability(title)
             response = Response(json.dumps(json_response), mimetype='application/json')
@@ -35,7 +35,7 @@ class LibraryGateway:
             return response
       
 
-      @http('GET', '/api/lightnovel/detail/<int:id>/')
+      @http('GET', '/api/library/lightnovel/detail/<int:id>')
       def lightnovel_detail(self, request, id):
             json_response = self.library_rpc.lightnovel_detail(id)
             response = Response(json.dumps(json_response), mimetype='application/json')
