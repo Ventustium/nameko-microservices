@@ -26,19 +26,19 @@ else{
 
 function get_libray(){
       global $client;
-      $response = $client->request('GET', '/api/library/lightnovel', []);
+      $response = $client->request('GET', '/api/library/book', []);
       return json_decode($response->getBody(), true);
 }
 
 function get_libray_detail($uuid){
       global $client;
-      $response = $client->request('GET', '/api/library/lightnovel/detail/'.$uuid, []);
+      $response = $client->request('GET', '/api/library/book/detail/'.$uuid, []);
       return json_decode($response->getBody(), true);
 }
 
 function get_libray_async(){
       global $client;
-      $response = $client->requestAsync('GET', '/api/library/lightnovel', []);
+      $response = $client->requestAsync('GET', '/api/library/book', []);
 
       $response->then(
             function (Response $res){
