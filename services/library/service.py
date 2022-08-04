@@ -7,9 +7,9 @@ class LibraryService:
       database = DatabaseProvider()
 
       @rpc
-      def lightnovel_list(self):
-            print("serviceLightNovelList Called")
-            result = self.database.lightnovel_list()
+      def book_list(self):
+            print("service book List Called")
+            result = self.database.book_list()
             if result:
                   response = {
                         "status" : "success",
@@ -23,8 +23,8 @@ class LibraryService:
                   }
 
       @rpc
-      def checking_lightnovel_availability(self, title):
-            result = self.database.checking_lightnovel_availability(title)
+      def checking_book_availability(self, title):
+            result = self.database.checking_book_availability(title)
             if result:
                   print("succes")
                   response = {
@@ -38,8 +38,8 @@ class LibraryService:
                         "message" : "No data"
                   }
       @rpc
-      def lightnovel_detail(self, id):
-            result = self.database.lightnovel_detail(id)
+      def book_detail(self, id_uuid):
+            result = self.database.book_detail(id_uuid)
             if result:
                   print("succes")
                   response = {

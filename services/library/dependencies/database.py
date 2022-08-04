@@ -15,10 +15,10 @@ class DatabaseWrapper:
       def __del__(self):
             self.connection.close()
 
-      def checking_lightnovel_availability(self, LnTitle):
+      def checking_book_availability(self, LnTitle):
             cursor = self.connection.cursor(dictionary=True)
             sql = """
-                  SELECT * FROM lightnovelLibrary WHERE title = '{}'
+                  SELECT uuid, title, author, genre, subgenre, height, publisher FROM books WHERE title = '{}'
             """.format(LnTitle)
             cursor.execute(sql)
             result = cursor.fetchone()
@@ -26,27 +26,25 @@ class DatabaseWrapper:
 
             return result
 
-      def lightnovel_detail(self, id):
+      def book_detail(self, id_uuid):
             cursor = self.connection.cursor(dictionary=True)
             sql = """
-                  SELECT * FROM lightnovelLibrary WHERE id = {} LIMIT 1
-            """.format(id)
+                  SELECT uuid, title, author, genre, subgenre, height, publisher FROM books WHERE uuid = '{}' LIMIT 1
+            """.format(id_uuid)
             cursor.execute(sql)
             result = cursor.fetchone()
             cursor.close()
-
             return result
 
-      def lightnovel_list(self):
+      def book_list(self):
             cursor = self.connection.cursor(dictionary=True, buffered = True)
             sql = """
-                  SELECT id, title FROM lightnovelLibrary
+                  SELECT uuid, title, author, genre, subgenre, height, publisher FROM books ORDER BY `title` ASC
             """
             cursor.execute(sql)
             result = cursor.fetchall()
             cursor.close()
             return result
-
 
 class DatabaseProvider(DependencyProvider):
 
