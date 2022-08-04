@@ -25,12 +25,12 @@ class DatabaseWrapper:
 
             return result
       
-      def user_account_registration(self, name, email_address, password):
+      def user_account_registration(self, id_uuid, name, email_address, password):
             cursor = self.connection.cursor(dictionary=True)
             sql = """
-                  INSERT INTO users (name, email_address, password)
-                  VALUES ('{}','{}','{}')
-            """.format(name, email_address, password)
+                  INSERT INTO users (uuid, name, email_address, password)
+                  VALUES ('{}', '{}', '{}', '{}')
+            """.format(id_uuid, name, email_address, password)
             cursor.execute(sql)
             self.connection.commit()
             cursor.close()

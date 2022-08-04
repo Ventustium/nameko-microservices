@@ -1,5 +1,6 @@
 import json
 import bcrypt
+import uuid
 
 from nameko.rpc import RpcProxy
 from nameko.web.handlers import http
@@ -64,12 +65,14 @@ class UserGatewayService:
             name = request.get_json()["name"]
             password = request.get_json()["password"]
             password = password.encode('utf-8')
+            id_uuid = str(uuid.uuid4())
             hashed_password= bcrypt.hashpw(password, bcrypt.gensalt()).decode('utf-8')
-            self.user_rpc.user_account_registration(name, email_address, hashed_password)
+            self.user_rpc.user_account_registration(id_uuid, name, email_address, hashed_password)
             response = Response(json.dumps({
                   "status" : "success",
                   "message" : "Account created successfully",
                   "data" : {
+                        "uuid" : id_uuid,
                         "name" : name,
                         "email_address" : email_address,
                         "password" : password.decode('utf-8')
@@ -126,3 +129,21 @@ class UserGatewayService:
             response.status_code=400
             return response
 
+      @http('GET', '/api/user/test/auth1')
+      def user_test_auth(self, request):
+            bearToken = request.headers.get("Authorization")
+            password = request.get_json()["password"]
+            if password == "hello":
+                  response=Response(json.dumps({"status":"Success","message": "Hello There!"}),mimetype="application/json")
+                  response.headers.set('Authorization', "Bearer HelloAgain")
+                  response.status_code=200
+                  return response
+            if bearToken == "Bearer HelloAgain":
+                  response=Response(json.dumps({"status":"Success","message": "Hello There Again!"}),mimetype="application/json")
+                  response.headers.set('Authorization', "Bearer HelloAgain")
+                  response.status_code=200
+                  return response
+            
+            response=Response(json.dumps({"status":"Success","message": "Failed"}),mimetype="application/json")
+            response.status_code=200
+            return response

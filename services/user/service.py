@@ -15,8 +15,9 @@ class UserService:
                         "status": "success",
                         "data": {
                               "id": user["id"],
+                              "uuid": user["uuid"],
                               "name": user["name"],
-                              "email_address": user["email_address"]
+                              "email_address": user["email_address"],
                         }
                   }
             else:
@@ -26,8 +27,8 @@ class UserService:
                   }
 
       @rpc
-      def user_account_registration(self, name, email_address, password):
-            return self.database.user_account_registration(name, email_address, password)
+      def user_account_registration(self, id_uuid, name, email_address, password):
+            return self.database.user_account_registration(id_uuid, name, email_address, password)
       
       @rpc
       def login_user_account(self, email_address, password):
