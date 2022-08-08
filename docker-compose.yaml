@@ -5,17 +5,26 @@ volumes:
 
 services:
   # Reverse Proxy
+  # nginx:
+  #   container_name: nameko-nginx
+  #   image: nginx:1.23.0-alpine
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+
   nginx:
-    container_name: nameko-nginx
-    image: nginx:1.23.0-alpine
+    container_name: nameko-microservices-nginx
+    # image: nginx:1.23.0-alpine
+    image: owasp/modsecurity-crs:3-nginx
     ports:
       - "80:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+     - ./nginx-modsecurity/nginx.conf:/etc/nginx/templates/nginx.conf.template:rw
   
   # AMQP
   rabbitmq:
-    container_name: nameko-rabbitmq
+    container_name: nameko-microservices-rabbitmq
     image: rabbitmq:3.10-management-alpine
     restart: always
     ports:
@@ -23,7 +32,7 @@ services:
   
   # Data Storage
   mysql:
-    container_name: nameko-mysql
+    container_name: nameko-microservices-mysql
     image: mysql:5.7.38-debian
     command: 
       --init-file /data/application/init.sql 
@@ -43,8 +52,8 @@ services:
   
   # Database Admin
   phpmyadmin:
-    container_name: nameko-phpmyadmin
-    image: phpmyadmin:latest
+    container_name: nameko-microservices-phpmyadmin
+    image: nameko-microservices-phpmyadmin
     restart: always
     depends_on:
       - mysql
@@ -52,8 +61,110 @@ services:
       - PMA_ARBITRARY=1
   
   redis:
-    container_name: catea-redis
+    container_name: nameko-microservices-redis
     image: redis:7.0.2-alpine3.16
     restart: always
     ports:
       - 6379:6379
+
+  # front end
+  web-ui-service:
+    container_name: nameko-microservices-web-ui-service
+    build: ./services/web-ui/
+    ports:
+      - 8020:8020
+    volumes:
+      - ./services/web-ui:/var/www/html
+    depends_on:
+      - nginx
+
+  user-service:
+    container_name: nameko-microservices-user-service
+    image: nameko-microservices-user-service
+    volumes:
+      - ./services/user:/data/application
+    restart: always
+    depends_on:
+      - rabbitmq
+      - mysql
+    environment:
+      - RABBIT_HOST=rabbitmq
+      - DB_HOST=mysql
+      - DB_PASS=change_me
+      - DB_NAME=nameko
+      - DB_USER=root
+  
+  user-gateway:
+    container_name: nameko-microservices-user-gateway
+    image: nameko-microservices-user-gateway
+    volumes:
+      - ./services/user:/data/application
+    restart: always
+    depends_on:
+      - rabbitmq
+      - mysql
+    environment:
+      - RABBIT_HOST=rabbitmq
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+  
+  library-service:
+    container_name: nameko-microservices-library-service
+    image: nameko-microservices-library-service
+    volumes:
+      - ./services/library:/data/application
+    restart: always
+    depends_on:
+      - rabbitmq
+      - mysql
+    environment:
+      - RABBIT_HOST=rabbitmq
+      - DB_HOST=mysql
+      - DB_PASS=change_me
+      - DB_NAME=nameko
+      - DB_USER=root
+  
+  library-gateway:
+    container_name: nameko-microservices-library-gateway
+    image: nameko-microservices-library-gateway
+    volumes:
+      - ./services/library:/data/application
+    restart: always
+    depends_on:
+      - rabbitmq
+      - mysql
+    environment:
+      - RABBIT_HOST=rabbitmq
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+
+  user-library-service:
+    container_name: nameko-microservices-user-library-service
+    image: nameko-microservices-user-library-service
+    volumes:
+      - ./services/user-library:/data/application
+    restart: always
+    depends_on:
+      - rabbitmq
+      - mysql
+    environment:
+      - RABBIT_HOST=rabbitmq
+      - DB_HOST=mysql
+      - DB_PASS=change_me
+      - DB_NAME=nameko
+      - DB_USER=root
+  
+  user-library-gateway:
+    container_name: nameko-microservices-user-library-gateway
+    image: nameko-microservices-user-library-gateway
+    volumes:
+      - ./services/user-library:/data/application
+    restart: always
+    depends_on:
+      - rabbitmq
+      - mysql
+    environment:
+      - RABBIT_HOST=rabbitmq
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
