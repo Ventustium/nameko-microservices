@@ -18,7 +18,7 @@ class DatabaseWrapper:
       def checking_book_availability(self, LnTitle):
             cursor = self.connection.cursor(dictionary=True)
             sql = """
-                  SELECT uuid, title, author, genre, subgenre, height, publisher FROM books WHERE title = '{}'
+                  SELECT uuid, title, author, genre, subgenre, height, publisher FROM library__books WHERE title = '{}'
             """.format(LnTitle)
             cursor.execute(sql)
             result = cursor.fetchone()
@@ -29,7 +29,7 @@ class DatabaseWrapper:
       def book_detail(self, id_uuid):
             cursor = self.connection.cursor(dictionary=True)
             sql = """
-                  SELECT uuid, title, author, genre, subgenre, height, publisher FROM books WHERE uuid = '{}' LIMIT 1
+                  SELECT uuid, title, author, genre, subgenre, height, publisher FROM library__books WHERE uuid = '{}' LIMIT 1
             """.format(id_uuid)
             cursor.execute(sql)
             result = cursor.fetchone()
@@ -39,7 +39,7 @@ class DatabaseWrapper:
       def book_list(self):
             cursor = self.connection.cursor(dictionary=True, buffered = True)
             sql = """
-                  SELECT uuid, title, author, genre, subgenre, height, publisher FROM books ORDER BY `title` ASC
+                  SELECT uuid, title, author, genre, subgenre, height, publisher FROM library__books ORDER BY `title` ASC
             """
             cursor.execute(sql)
             result = cursor.fetchall()
@@ -58,7 +58,7 @@ class DatabaseProvider(DependencyProvider):
                         pool_reset_session=True,
                         host=os.environ.get('DB_HOST', '127.0.0.1'),
                         port=os.environ.get('DB_PORT', 3306),
-                        database=os.environ.get('DB_NAME', 'nameko_library'),
+                        database=os.environ.get('DB_NAME', 'nameko'),
                         user=os.environ.get('DB_USER', 'root'),
                         password=os.environ.get('DB_PASS', 'change_me')
                   )

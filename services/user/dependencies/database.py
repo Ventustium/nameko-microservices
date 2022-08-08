@@ -17,7 +17,7 @@ class DatabaseWrapper:
       def checking_user_account_availability(self, email_address):
             cursor = self.connection.cursor(dictionary=True)
             sql = """
-                  SELECT * FROM users WHERE email_address = '{}'
+                  SELECT * FROM user__users WHERE email_address = '{}'
             """.format(email_address)
             cursor.execute(sql)
             result = cursor.fetchone()
@@ -28,7 +28,7 @@ class DatabaseWrapper:
       def user_account_registration(self, id_uuid, name, email_address, password):
             cursor = self.connection.cursor(dictionary=True)
             sql = """
-                  INSERT INTO users (uuid, name, email_address, password)
+                  INSERT INTO user__users (uuid, name, email_address, password)
                   VALUES ('{}', '{}', '{}', '{}')
             """.format(id_uuid, name, email_address, password)
             cursor.execute(sql)
@@ -48,7 +48,7 @@ class DatabaseProvider(DependencyProvider):
                         pool_reset_session=True,
                         host=os.environ.get('DB_HOST', '127.0.0.1'),
                         port=os.environ.get('DB_PORT', 3306),
-                        database=os.environ.get('DB_NAME', 'nameko_user'),
+                        database=os.environ.get('DB_NAME', 'nameko'),
                         user=os.environ.get('DB_USER', 'root'),
                         password=os.environ.get('DB_PASS', 'change_me')
                   )

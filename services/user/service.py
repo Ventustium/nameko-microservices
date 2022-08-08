@@ -14,9 +14,24 @@ class UserService:
                   return {
                         "status": "success",
                         "data": {
-                              "id": user["id"],
-                              "uuid": user["uuid"],
-                              "name": user["name"],
+                              "email_address": user["email_address"],
+                        }
+                  }
+            else:
+                  return{
+                        "status": "error",
+                        "message": "User not found"
+                  }
+      
+      @rpc
+      def checking_user_account_get_detail(self, email_address):
+            user = self.database.checking_user_account_availability(email_address)
+            if user:
+                  return {
+                        "status": "success",
+                        "data": {
+                              "uuid" : user['uuid'],
+                              "name" : user['name'],
                               "email_address": user["email_address"],
                         }
                   }

@@ -25,7 +25,6 @@ class UserGatewayService:
             # {
             #     "status": "success",
             #     "data": {
-            #           "name": "Kevin",
             #           "email_address": "kevin@kevin.com"
             #     }
             # }
@@ -101,7 +100,7 @@ class UserGatewayService:
                         "message":"Logged in successfully"
                   }), mimetype = 'application/json')
                   session_id = self.session_provider.generate_session_id()
-                  user_data=self.user_rpc.checking_user_account_availability(email_address)
+                  user_data=self.user_rpc.checking_user_account_get_detail(email_address)
                   self.session_provider.set_session_data(session_id,json.dumps(user_data["data"]))
                   print(user_data)
                   response.set_cookie('SESSID', session_id)
